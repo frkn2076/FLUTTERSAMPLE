@@ -1,4 +1,4 @@
-# fluttersample
+# FlutterSample
 
 A new Flutter project.
 
