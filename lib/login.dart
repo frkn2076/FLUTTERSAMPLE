@@ -4,13 +4,15 @@ import 'package:fluttersample/util/caller.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class Login extends StatelessWidget {
+  final bool isTurkish;
+  Login({this.isTurkish = true}) : super();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter ToDo App',
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        primarySwatch: Colors.blue,
       ),
       home: LoginPage(),
     );
@@ -18,6 +20,8 @@ class Login extends StatelessWidget {
 }
 
 class LoginPage extends StatefulWidget {
+  final bool isTurkish;
+  LoginPage({this.isTurkish = true}) : super();
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -37,6 +41,20 @@ class _LoginPageState extends State<LoginPage> {
         title: Text(isTurkish ? "Giriş yap / Kayıt ol Sayfası" : "Sign in / Sign up Page"),
       ),
       body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFE3F2FD),
+              Color(0xFFBBDEFB),
+              Color(0xFF90CAF9),
+              Color(0xFF64B5F6),
+              Color(0xFF42A5F5)
+            ],
+            stops: [0.1, 0.3, 0.5, 0.7, 0.9],
+          ),
+        ),
         child: Column(
           children: <Widget>[
             emptyInterval(multiplier: 2),
@@ -61,9 +79,9 @@ class _LoginPageState extends State<LoginPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  buildButtonWidget(isTurkish ? "Giriş" : "Sign in"),
+                  buildButtonWidget(isTurkish ? "Giriş" : "Sign in", true),
                   emptyInterval(multiplier: 2),
-                  buildButtonWidget(isTurkish ? "Kayıt ol" : "Sign up"),
+                  buildButtonWidget(isTurkish ? "Kayıt ol" : "Sign up", false),
                 ],
               ),
             ),
@@ -130,14 +148,15 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget buildButtonWidget(String text) {
+  Widget buildButtonWidget(String text, bool isLogin) {
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           TextButton(
             onPressed: () {
-              API.login(
+              if(isLogin) {
+                API.login(
                 isTurkish ? "TR" : "EN",
                 userNameController.text,
                 passwordController.text,
@@ -145,11 +164,26 @@ class _LoginPageState extends State<LoginPage> {
                   .then((value) {
                 if (value.isSuccess == true) {
                   Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Todo()));
+                      context, MaterialPageRoute(builder: (context) => Todo(isTurkish: isTurkish,)));
                 } else {
                   _popup(context, value.errorMessage.toString());
                 }
               });
+              } else {
+                API.register(
+                isTurkish ? "TR" : "EN",
+                userNameController.text,
+                passwordController.text,
+              )
+                  .then((value) {
+                if (value.isSuccess == true) {
+                  _popup(context, isTurkish ? "Kayıt işlemi tamamlandı!" : "Registration completed!");
+                } else {
+                  _popup(context, value.errorMessage.toString());
+                }
+              });
+              }
+              
             },
             child: Text(
               text,
