@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(Todo());
+import 'login.dart';
 
 class Todo extends StatelessWidget {
+  final bool isTurkish;
+  Todo({this.isTurkish = true}) : super();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -11,38 +13,36 @@ class Todo extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: TodoPage(title: 'Flutter Sample'),
+      home: TodoPage(isTurkish: isTurkish,),
     );
   }
 }
 
 class TodoPage extends StatefulWidget {
-  TodoPage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
+  final bool isTurkish;
+  TodoPage({this.isTurkish = true}) : super();
   @override
   _TodoPageState createState() => _TodoPageState();
 }
 
 class _TodoPageState extends State<TodoPage> {
-  int _counter = 0;
-  final nameController = TextEditingController();
-  final descriptionController = TextEditingController();
-  final deadlineController = TextEditingController();
-  final isCompletedController = TextEditingController();
-  // MediaQuery.of(context).size.width
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  final _nameController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _deadlineController = TextEditingController();
+  final _isCompletedController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.isTurkish ? "ToDo Sayfası" : "ToDo Page"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => Login()));
+          },
+        ),
       ),
       body: Container(
         child: Column(
@@ -52,20 +52,21 @@ class _TodoPageState extends State<TodoPage> {
               child: Row(
                 children: [
                   emptyInterval(),
-                  buildTextWidget(nameController, 'Enter Name of Todo'),
+                  buildTextWidget(_nameController, 'Enter Name of Todo'),
                   emptyInterval(),
                   buildTextWidget(
-                      descriptionController, 'Enter Description of Todo'),
-                  emptyInterval(),
-                  buildTextWidget(deadlineController, 'Enter Deadline of Todo'),
+                      _descriptionController, 'Enter Description of Todo'),
                   emptyInterval(),
                   buildTextWidget(
-                      isCompletedController, 'Enter IsCompleted of Todo'),
+                      _deadlineController, 'Enter Deadline of Todo'),
+                  emptyInterval(),
+                  buildTextWidget(
+                      _isCompletedController, 'Enter IsCompleted of Todo'),
                 ],
               ),
             ),
-            buildTextWidget(nameController, 'Enter Name of Todo1'),
-            buildTextWidget(nameController, 'Enter Name of Todo2'),
+            buildTextWidget(_nameController, 'Enter Name of Todo1'),
+            buildTextWidget(_nameController, 'Enter Name of Todo2'),
           ],
         ),
       ),
