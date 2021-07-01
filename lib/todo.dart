@@ -67,34 +67,41 @@ class _TodoPageState extends State<TodoPage> {
             stops: [0.1, 0.3, 0.5, 0.7, 0.9],
           ),
         ),
-        child: Column(
-          children: <Widget>[
-            emptyInterval(),
-            emptyInterval(),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  emptyInterval(),
-                  buildTextWidget(_nameController, 'Enter Name of Todo'),
-                  emptyInterval(),
-                  buildTextWidget(
-                      _descriptionController, 'Enter Description of Todo'),
-                  emptyInterval(),
-                  buildTextWidget(
-                      _deadlineController, 'Enter Deadline of Todo'),
-                  emptyInterval(),
-                  buildTextWidget(
-                      _isCompletedController, 'Enter IsCompleted of Todo'),
-                ],
-              ),
+        child: Column(children: <Widget>[
+          Expanded(
+            flex: 4,
+            child: Column(
+              children: <Widget>[
+                emptyInterval(),
+                emptyInterval(),
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      emptyInterval(),
+                      buildTextWidget(_nameController, 'Enter Name of Todo'),
+                      emptyInterval(),
+                      buildTextWidget(
+                          _descriptionController, 'Enter Description of Todo'),
+                      emptyInterval(),
+                      buildTextWidget(
+                          _deadlineController, 'Enter Deadline of Todo'),
+                      emptyInterval(),
+                      buildTextWidget(
+                          _isCompletedController, 'Enter IsCompleted of Todo'),
+                    ],
+                  ),
+                ),
+                buildButtonWidget(widget.isTurkish ? "Ekle" : "Add"),
+              ],
             ),
-            buildButtonWidget(widget.isTurkish ? "Ekle" : "Add"),
-            emptyInterval(),
-            emptyInterval(),
-            buildTodoList(context),
-          ],
-        ),
+          ),
+          emptyInterval(),
+          Expanded(
+            flex: 4,
+            child: buildTodoList(context),
+          ),
+        ]),
       ),
     );
   }
@@ -134,8 +141,8 @@ class _TodoPageState extends State<TodoPage> {
 
   Widget buildTodoList(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width / 10,
-      height: MediaQuery.of(context).size.width / 10,
+      width: MediaQuery.of(context).size.width / 2,
+      height: MediaQuery.of(context).size.width / 2,
       child: DataTable(
           columns: const <DataColumn>[
             DataColumn(
