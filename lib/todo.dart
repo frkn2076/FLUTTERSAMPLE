@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:fluttersample/util/caller.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -34,6 +35,7 @@ class _TodoPageState extends State<TodoPage> {
   final _descriptionController = TextEditingController();
   final _deadlineController = TextEditingController();
   final _isCompletedController = TextEditingController();
+  DateTime _deadline = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +86,7 @@ class _TodoPageState extends State<TodoPage> {
                       buildTextWidget(
                           _descriptionController, 'Enter Description of Todo'),
                       emptyInterval(),
-                      buildTextWidget(
-                          _deadlineController, 'Enter Deadline of Todo'),
+                      buildDateTimePicker(),
                       emptyInterval(),
                       buildTextWidget(
                           _isCompletedController, 'Enter IsCompleted of Todo'),
@@ -124,6 +125,27 @@ class _TodoPageState extends State<TodoPage> {
         ),
       ),
     );
+  }
+
+  Widget buildDateTimePicker() {
+    return TextButton(
+        onPressed: () {
+          var now = DateTime.now();
+          DatePicker.showDatePicker(context,
+              showTitleActions: true,
+              minTime: now,
+              maxTime: DateTime(now.year + 1, now.month, now.day),
+              onChanged: (date) {
+          }, onConfirm: (date) {
+            setState(() {
+              _deadline = date;
+            });
+          }, currentTime: DateTime.now(), locale: LocaleType.tr);
+        },
+        child: Text(
+          _deadline.toString(),
+          style: TextStyle(color: Colors.blue),
+        ));
   }
 
   Widget buildButtonWidget(String text) {
