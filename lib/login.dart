@@ -3,6 +3,8 @@ import 'package:fluttersample/todo.dart';
 import 'package:fluttersample/util/caller.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
+import 'models/loginresponse.dart';
+
 class Login extends StatelessWidget {
   final bool isTurkish;
   Login({this.isTurkish = true}) : super();
@@ -38,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isTurkish ? "Giriş yap / Kayıt ol Sayfası" : "Sign in / Sign up Page"),
+        title: Text(isTurkish ? 'Giriş yap / Kayıt ol Sayfası' : 'Sign in / Sign up Page'),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -55,38 +57,7 @@ class _LoginPageState extends State<LoginPage> {
             stops: [0.1, 0.3, 0.5, 0.7, 0.9],
           ),
         ),
-        child: Column(
-          children: <Widget>[
-            emptyInterval(multiplier: 2),
-            languageDropDown(),
-            emptyInterval(multiplier: 3),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  emptyInterval(multiplier: 2),
-                  buildTextWidget(userNameController,
-                      isTurkish ? "Kullanıcı adı" : "User name"),
-                  emptyInterval(multiplier: 2),
-                  buildTextWidget(
-                      passwordController, isTurkish ? "Şifre" : "Password",
-                      hasHiddenIcon: true),
-                ],
-              ),
-            ),
-            emptyInterval(),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  buildButtonWidget(isTurkish ? "Giriş" : "Sign in", true),
-                  emptyInterval(multiplier: 2),
-                  buildButtonWidget(isTurkish ? "Kayıt ol" : "Sign up", false),
-                ],
-              ),
-            ),
-          ],
-        ),
+        child: buildScreenWidget(),
       ),
     );
   }
@@ -155,34 +126,30 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           TextButton(
             onPressed: () {
-              if(isLogin) {
-                API.login(
-                isTurkish ? "TR" : "EN",
-                userNameController.text,
-                passwordController.text,
-              )
-                  .then((value) {
-                if (value.isSuccess == true) {
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Todo(isTurkish: isTurkish,)));
-                } else {
-                  _popup(context, value.errorMessage.toString());
-                }
-              });
+              setState(() {
+                if(isLogin) {
+                  login(isTurkish ? 'TR' : 'EN', userNameController.text, passwordController.text).then((response) 
+                  {
+                    if(response.isSuccess == true) {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => Todo(isTurkish: isTurkish,)));
+                    } else {
+                      _popup(context, message: isTurkish ? "Giriş bilgilerinizi kontrol ediniz" : "Check your credentials");
+                    }
+                  }
+                  );
               } else {
-                API.register(
-                isTurkish ? "TR" : "EN",
-                userNameController.text,
-                passwordController.text,
-              )
-                  .then((value) {
-                if (value.isSuccess == true) {
-                  _popup(context, isTurkish ? "Kayıt işlemi tamamlandı!" : "Registration completed!");
-                } else {
-                  _popup(context, value.errorMessage.toString());
-                }
-              });
+                register(isTurkish ? 'TR' : 'EN', userNameController.text, passwordController.text).then((response) 
+                  {
+                    if(response.isSuccess == true) {
+                      _popup(context, message: isTurkish ? "Kayıt işlemi başarılı" : "Registered succesfully");
+                    }
+                    else {
+                      _popup(context, message: response.errorMessage);
+                    }
+                  }
+                );
               }
+              });
               
             },
             child: Text(
@@ -195,15 +162,50 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  _popup(BuildContext context, String? message){
+  Widget buildScreenWidget(){
+    return Column(
+          children: <Widget>[
+            emptyInterval(multiplier: 2),
+            languageDropDown(),
+            emptyInterval(multiplier: 3),
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  emptyInterval(multiplier: 2),
+                  buildTextWidget(userNameController,
+                      isTurkish ? 'Kullanıcı adı' : 'User name'),
+                  emptyInterval(multiplier: 2),
+                  buildTextWidget(
+                      passwordController, isTurkish ? 'Şifre' : 'Password',
+                      hasHiddenIcon: true),
+                ],
+              ),
+            ),
+            emptyInterval(),
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  buildButtonWidget(isTurkish ? 'Giriş' : 'Sign in', true),
+                  emptyInterval(multiplier: 2),
+                  buildButtonWidget(isTurkish ? 'Kayıt ol' : 'Sign up', false),
+                ],
+              ),
+            ),
+          ],
+        );
+  }
+
+  _popup(BuildContext context, {String? message}){
     Alert(
         context: context,
-        title: message ?? (isTurkish ? "Geçici süre hizmet veremiyoruz" : "We are temporarily unavailable"),
+        title: message ?? (isTurkish ? 'Geçici süre hizmet veremiyoruz' : 'We are temporarily unavailable'),
         buttons: [
           DialogButton(
             onPressed: () => Navigator.of(context,rootNavigator: true).pop(),
             child: Text(
-              isTurkish ? "Tamam" : "Okay",
+              isTurkish ? 'Tamam' : 'Okay',
               style: TextStyle(color: Colors.white, fontSize: 20),
             ),
           )
