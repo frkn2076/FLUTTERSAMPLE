@@ -1,57 +1,56 @@
 class TodosResponse {
   bool? isSuccess;
   String? errorMessage;
-  List<Todo>? todos;
+  List<TodoResponse>? todos;
 
   TodosResponse({this.isSuccess, this.errorMessage, this.todos});
 
   TodosResponse.fromJson(Map<String, dynamic> json) {
-    isSuccess = json['isSuccess'];
-    errorMessage = json['errorMessage'];
-    if (json['todos'] != null) {
-      todos = List.empty();
-      json['todos'].forEach((v) {
-        todos!.add(new Todo.fromJson(v));
-      });
+    isSuccess = json['IsSuccess'];
+    errorMessage = json['ErrorMessage'];
+    todos = [];
+    if (json['Todos'] != null) {
+      for (var todo in json['Todos']) {
+        todos!.add(TodoResponse.fromJson(todo));
+      }
     }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['isSuccess'] = this.isSuccess;
-    data['errorMessage'] = this.errorMessage;
+    data['IsSuccess'] = this.isSuccess;
+    data['ErrorMessage'] = this.errorMessage;
     if (this.todos != null) {
-      data['todos'] = this.todos?.map((v) => v.toJson()).toList();
+      data['Todos'] = this.todos?.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
-class Todo {
+class TodoResponse {
   int? id;
   String? name;
   String? description;
   String? deadline;
   bool? isCompleted;
 
-  Todo(
-      {this.id, this.name, this.description, this.deadline, this.isCompleted});
+  TodoResponse({this.id, this.name, this.description, this.deadline, this.isCompleted});
 
-  Todo.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    description = json['description'];
-    deadline = json['deadline'];
-    isCompleted = json['isCompleted'];
+  TodoResponse.fromJson(Map<String, dynamic> json) {
+    id = json['Id'];
+    name = json['Name'];
+    description = json['Description'];
+    deadline = json['Deadline'];
+    isCompleted = json['IsCompleted'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['description'] = this.description;
-    data['deadline'] = this.deadline;
-    data['isCompleted'] = this.isCompleted;
+    data['Id'] = this.id;
+    data['Name'] = this.name;
+    data['Description'] = this.description;
+    data['Deadline'] = this.deadline;
+    data['IsCompleted'] = this.isCompleted;
     return data;
   }
 }

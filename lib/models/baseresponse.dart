@@ -5,14 +5,14 @@ class BaseResponse {
   BaseResponse({this.isSuccess, this.errorMessage});
 
   BaseResponse.fromJson(Map<String, dynamic> json) {
-    isSuccess = json['isSuccess'];
-    errorMessage = json['errorMessage'];
+    isSuccess = json['IsSuccess'];
+    errorMessage = json['ErrorMessage'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['isSuccess'] = this.isSuccess;
-    data['errorMessage'] = this.errorMessage;
+    data['IsSuccess'] = this.isSuccess;
+    data['ErrorMessage'] = this.errorMessage;
     return data;
   }
 }

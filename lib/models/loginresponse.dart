@@ -6,16 +6,16 @@ class LoginResponse {
   LoginResponse({this.isSuccess, this.errorMessage, this.token});
 
   LoginResponse.fromJson(Map<String, dynamic> json) {
-    isSuccess = json['isSuccess'];
-    errorMessage = json['errorMessage'];
-    token = json['token'];
+    isSuccess = json['IsSuccess'];
+    errorMessage = json['ErrorMessage'];
+    token = json['Token'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['isSuccess'] = this.isSuccess;
-    data['errorMessage'] = this.errorMessage;
-    data['token'] = this.token;
+    data['IsSuccess'] = this.isSuccess;
+    data['ErrorMessage'] = this.errorMessage;
+    data['Token'] = this.token;
     return data;
   }
 }
