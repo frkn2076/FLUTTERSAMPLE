@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:fluttersample/models/todosresponse.dart';
 import 'package:fluttersample/util/caller.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -7,7 +8,7 @@ import 'login.dart';
 
 class Todo extends StatelessWidget {
   final bool isTurkish;
-  Todo({this.isTurkish = true}) : super();
+  Todo({Key? key, this.isTurkish = true}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,32 +26,40 @@ class Todo extends StatelessWidget {
 
 class TodoPage extends StatefulWidget {
   final bool isTurkish;
-  TodoPage({this.isTurkish = true}) : super();
+  TodoPage({Key? key, this.isTurkish = true}) : super(key: key);
+
   @override
   _TodoPageState createState() => _TodoPageState();
 }
 
 class _TodoPageState extends State<TodoPage> {
+  Future<TodosResponse> _futureTodos = getTodos();
+
+  @override
+  void initState() {
+    _futureTodos = getTodos();
+    super.initState();
+  }
+
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _deadlineController = TextEditingController();
-  final _isCompletedController = TextEditingController();
   DateTime _deadline = DateTime.now();
+  bool _isComplete = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isTurkish ? "ToDo Sayfası" : "ToDo Page"),
+        title: Text(widget.isTurkish ? 'ToDo Sayfası' : 'ToDo Page'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => Login(
-                          isTurkish: widget.isTurkish,
-                        )));
+              context,
+              MaterialPageRoute(
+                builder: (context) => Login(isTurkish: widget.isTurkish),
+              ),
+            );
           },
         ),
       ),
@@ -74,30 +83,35 @@ class _TodoPageState extends State<TodoPage> {
             flex: 4,
             child: Column(
               children: <Widget>[
-                emptyInterval(),
-                emptyInterval(),
+                emptyInterval(context),
+                emptyInterval(context),
                 Container(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      emptyInterval(),
-                      buildTextWidget(_nameController, 'Enter Name of Todo'),
-                      emptyInterval(),
+                      emptyInterval(context),
+                      buildTextWidget(context, _nameController,
+                          widget.isTurkish ? 'İsim giriniz' : 'Enter name'),
+                      emptyInterval(context),
                       buildTextWidget(
-                          _descriptionController, 'Enter Description of Todo'),
-                      emptyInterval(),
-                      buildDateTimePicker(),
-                      emptyInterval(),
-                      buildTextWidget(
-                          _isCompletedController, 'Enter IsCompleted of Todo'),
+                          context,
+                          _descriptionController,
+                          widget.isTurkish
+                              ? 'Tanım giriniz'
+                              : 'Enter description'),
+                      emptyInterval(context),
+                      buildDateTimePicker(context),
+                      emptyInterval(context),
+                      buildCheckboxWidget(context,
+                          widget.isTurkish ? 'Tamamlandı mı' : 'Is Completed')
                     ],
                   ),
                 ),
-                buildButtonWidget(widget.isTurkish ? "Ekle" : "Add"),
+                buildButtonWidget(context, widget.isTurkish ? 'Ekle' : 'Add'),
               ],
             ),
           ),
-          emptyInterval(),
+          emptyInterval(context),
           Expanded(
             flex: 4,
             child: buildTodoList(context),
@@ -107,13 +121,14 @@ class _TodoPageState extends State<TodoPage> {
     );
   }
 
-  Widget emptyInterval() {
+  Widget emptyInterval(BuildContext context) {
     return SizedBox(
         width: MediaQuery.of(context).size.width / 40,
         height: MediaQuery.of(context).size.height / 40);
   }
 
-  Widget buildTextWidget(TextEditingController controller, String hintText) {
+  Widget buildTextWidget(
+      BuildContext context, TextEditingController controller, String hintText) {
     return Container(
       width: MediaQuery.of(context).size.width / 10,
       height: MediaQuery.of(context).size.width / 10,
@@ -127,33 +142,70 @@ class _TodoPageState extends State<TodoPage> {
     );
   }
 
-  Widget buildDateTimePicker() {
-    return TextButton(
+  Widget buildCheckboxWidget(BuildContext context, String text) {
+    return Container(
+      width: MediaQuery.of(context).size.width / 10,
+      height: MediaQuery.of(context).size.width / 10,
+      child: CheckboxListTile(
+        checkColor: Colors.black,
+        activeColor: Colors.blue,
+        title: Text(text),
+        value: _isComplete,
+        onChanged: (newValue) {
+          setState(() {
+            _isComplete = newValue == true;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget buildDateTimePicker(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.width / 13),
+      child: OutlinedButton(
         onPressed: () {
           var now = DateTime.now();
           DatePicker.showDatePicker(context,
               showTitleActions: true,
               minTime: now,
-              maxTime: DateTime(now.year + 1, now.month, now.day),
-              onChanged: (date) {
-          }, onConfirm: (date) {
+              maxTime: DateTime(now.year + 10, now.month, now.day),
+              onChanged: (date) {}, onConfirm: (date) {
             setState(() {
               _deadline = date;
             });
-          }, currentTime: DateTime.now(), locale: LocaleType.tr);
+          },
+              currentTime: DateTime.now(),
+              locale: widget.isTurkish ? LocaleType.tr : LocaleType.en);
         },
         child: Text(
           _deadline.toString(),
           style: TextStyle(color: Colors.blue),
-        ));
+        ),
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              side: BorderSide(color: Colors.red, width: 2),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
-  Widget buildButtonWidget(String text) {
+  Widget buildButtonWidget(BuildContext context, String text) {
     return Container(
       width: MediaQuery.of(context).size.width / 20,
       height: MediaQuery.of(context).size.width / 20,
       child: TextButton(
-        onPressed: () {},
+        onPressed: () {
+          var formattedDate = dateFormatter(_deadline);
+          addTodo(widget.isTurkish ? "TR" : "EN", _nameController.text,
+                  _descriptionController.text, formattedDate, _isComplete)
+              .then((value) => setState(() {
+                    _futureTodos = getTodos();
+                  }));
+        },
         child: Text(
           text,
         ),
@@ -163,53 +215,79 @@ class _TodoPageState extends State<TodoPage> {
 
   Widget buildTodoList(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width / 2,
-      height: MediaQuery.of(context).size.width / 2,
-      child: DataTable(
-          columns: const <DataColumn>[
-            DataColumn(
-              label: Text(
-                'Name',
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Description',
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'Deadline',
-              ),
-            ),
-            DataColumn(
-              label: Text(
-                'IsCompleted',
-              ),
-            ),
-          ],
-          rows: API
-                  .fetchTodos()
-                  .todos
-                  ?.map((todo) => DataRow(
-                        cells: <DataCell>[
-                          DataCell(Text(todo.name.toString())),
-                          DataCell(Text(todo.description.toString())),
-                          DataCell(Text(todo.deadline.toString())),
-                          DataCell(Text(todo.isCompleted.toString())),
-                        ],
-                      ))
-                  .toList() ??
-              _popup(context)),
-    );
+        width: MediaQuery.of(context).size.width / 2,
+        height: MediaQuery.of(context).size.height / 2,
+        child: FutureBuilder<TodosResponse>(
+          future: _futureTodos,
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data?.isSuccess == true) {
+              return DataTable(
+                  columns: const <DataColumn>[
+                    DataColumn(
+                      label: Text(
+                        'Name',
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Description',
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Deadline',
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'IsCompleted',
+                      ),
+                    ),
+                  ],
+                  rows: snapshot.data!.todos!
+                      .map((todo) => DataRow(
+                            cells: <DataCell>[
+                              DataCell(Text(todo.name!.toString())),
+                              DataCell(Text(todo.description!.toString())),
+                              DataCell(Text(todo.deadline!.toString())),
+                              DataCell(Text(todo.isCompleted!.toString())),
+                            ],
+                          ))
+                      .toList());
+            } else if (snapshot.hasData && snapshot.data?.isSuccess != true) {
+              _popup(context, message: snapshot.data?.errorMessage);
+            }
+            return Center(child: CircularProgressIndicator());
+          },
+        ));
   }
 
-  _popup(BuildContext context) {
+  _popup(BuildContext context, {String? message}) {
     Alert(
-      context: context,
-      title: widget.isTurkish
-          ? "Beklenmedik bir hata oluştu!"
-          : "Something went wrong!",
-    ).show();
+        context: context,
+        title: message ??
+            (widget.isTurkish
+                ? 'Geçici süre hizmet veremiyoruz'
+                : 'We are temporarily unavailable'),
+        buttons: [
+          DialogButton(
+            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+            child: Text(
+              widget.isTurkish ? 'Tamam' : 'Okay',
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          )
+        ]).show();
+  }
+
+  String dateFormatter(DateTime date) {
+    var tire = "-";
+    var colon = ":";
+    return date.year.toString().padLeft(2, '0') +
+        tire +
+        date.month.toString().padLeft(2, '0') +
+        tire +
+        date.day.toString().padLeft(2, '0') +
+        "T00:00:00+03:00";
   }
 }
