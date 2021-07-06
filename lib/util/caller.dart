@@ -1,58 +1,64 @@
 import 'package:fluttersample/models/baseresponse.dart';
 import 'package:fluttersample/models/loginresponse.dart';
 import 'package:fluttersample/models/todosresponse.dart';
-// import 'package:http/http.dart' as http;
-// import 'dart:convert';
+import 'package:fluttersample/util/holder.dart';
+import 'dart:convert';
 
-class API {
-  static Future<LoginResponse> login(
-      String language, String userName, String password) async {
-    if (userName == "fbr" && password == "123")
-      return LoginResponse(isSuccess: true, token: "dummytoken");
-    else
-      return LoginResponse(isSuccess: false, errorMessage: "dummyErrorMessage");
+import 'helper.dart';
 
-    // final response = await http.post(
-    //     Uri.parse('http://127.0.0.1:3000/account/login'),
-    //     headers: <String, String>{
-    //       "Access-Control-Allow-Origin": "*",
-    //       "content-type" : "application/json",
-    //       "accept" : "application/json",
-    //       "Access-Control-Allow-Methods": "POST"
-    //     },
-    //     body: jsonEncode(<String, String>{
-    //       'Language': language,
-    //       'UserName': userName,
-    //       'Password': password
-    //     }));
-
-    // if (response.statusCode == 200) {
-    //   return json
-    //       .decode(response.body)
-    //       .map<BaseResponse>((data) => BaseResponse.fromJson(data))
-    //       .toList();
-    // } else {
-    //   throw Exception('Failed to load category');
-    // }
+Future<LoginResponse> login(String language, String userName, String password) async {
+  final body = jsonEncode(<String, String>{
+    'Language': language,
+    'UserName': userName,
+    'Password': password
+  });
+  final response = await postCall('account/login', body, false);
+  if (response.statusCode == 200) {
+    var responseModel = LoginResponse.fromJson(jsonDecode(response.body));
+    Holder.authToken = responseModel.token!;
+    return responseModel;
+  } else {
+    throw Exception('Failed to load login');
   }
+}
 
-  static Future<LoginResponse> register(
-      String language, String userName, String password) async {
-    if (userName == "fbr" && password == "rrr")
-      return LoginResponse(isSuccess: true, token: "dummytoken");
-    else
-      return LoginResponse(isSuccess: false, errorMessage: "dummyErrorMessage");
+Future<LoginResponse> register(String language, String userName, String password) async {
+  final body = jsonEncode(<String, String>{
+    'Language': language,
+    'UserName': userName,
+    'Password': password
+  });
+  final response = await postCall('account/register', body, false);
+  if (response.statusCode == 200) {
+    var responseModel = LoginResponse.fromJson(jsonDecode(response.body));
+    Holder.authToken = responseModel.token!;
+    return responseModel;
+  } else {
+    throw Exception('Failed to load register');
   }
+}
 
-  static Future<BaseResponse> addTodo(String name, String description, DateTime deadline, bool isCompleted) async {
-      return BaseResponse(isSuccess: true, errorMessage: null);
+Future<BaseResponse> addTodo(String language, String name, String description, String deadline, bool isCompleted) async {
+  final body = jsonEncode(<String, Object>{
+    'Language': language,
+    'Name': name,
+    'Description': description,
+    'Deadline': deadline,
+    'IsCompleted': isCompleted
+  });
+  final response = await postCall('todo/add', body, true);
+  if (response.statusCode == 200) {
+    return BaseResponse.fromJson(jsonDecode(response.body));
+  } else {
+    throw Exception('Failed to load addTodo');
   }
+}
 
-  static TodosResponse fetchTodos() {
-      return TodosResponse(isSuccess: true, errorMessage: null, todos: [
-        Todo(id: 1, name: "dummyname1", description: "dummydesc1", deadline: "adsa1", isCompleted: true),
-        Todo(id: 2, name: "dummyname2", description: "dummydesc2", deadline: "adsa2", isCompleted: false),
-        Todo(id: 3, name: "dummyname3", description: "dummydesc3", deadline: "adsa3", isCompleted: true)
-      ]);
+Future<TodosResponse> getTodos() async {
+  final response = await getCall('todo/getall', true);
+  if (response.statusCode == 200) {
+    return TodosResponse.fromJson(jsonDecode(response.body));
+  } else {
+    throw Exception('Failed to load getTodo');
   }
 }
