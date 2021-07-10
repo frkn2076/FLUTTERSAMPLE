@@ -15,7 +15,9 @@ Future<LoginResponse> login(String language, String userName, String password) a
   final response = await postCall('account/login', body, false);
   if (response.statusCode == 200) {
     var responseModel = LoginResponse.fromJson(jsonDecode(response.body));
-    Holder.authToken = responseModel.token!;
+    if (responseModel.token != null){
+      Holder.authToken = responseModel.token!;
+    }
     return responseModel;
   } else {
     throw Exception('Failed to load login');
@@ -29,9 +31,12 @@ Future<LoginResponse> register(String language, String userName, String password
     'Password': password
   });
   final response = await postCall('account/register', body, false);
+  print("a");
   if (response.statusCode == 200) {
     var responseModel = LoginResponse.fromJson(jsonDecode(response.body));
-    Holder.authToken = responseModel.token!;
+    if (responseModel.token != null){
+      Holder.authToken = responseModel.token!;
+    }
     return responseModel;
   } else {
     throw Exception('Failed to load register');
