@@ -1,3 +1,4 @@
+import 'package:fluttersample/util/extensions.dart';
 class TodosResponse {
   bool? isSuccess;
   String? errorMessage;
@@ -6,8 +7,8 @@ class TodosResponse {
   TodosResponse({this.isSuccess, this.errorMessage, this.todos});
 
   TodosResponse.fromJson(Map<String, dynamic> json) {
-    isSuccess = json['IsSuccess'];
-    errorMessage = json['ErrorMessage'];
+    isSuccess = json.getValue('IsSuccess');
+    errorMessage = json.getValue('ErrorMessage');
     todos = [];
     if (json['Todos'] != null) {
       for (var todo in json['Todos']) {
@@ -37,11 +38,11 @@ class TodoResponse {
   TodoResponse({this.id, this.name, this.description, this.deadline, this.isCompleted});
 
   TodoResponse.fromJson(Map<String, dynamic> json) {
-    id = json['Id'];
-    name = json['Name'];
-    description = json['Description'];
-    deadline = json['Deadline'];
-    isCompleted = json['IsCompleted'];
+    id = json.getValue('Id');
+    name = json.getValue('Name');
+    description = json.getValue('Description');
+    deadline = json.getValue('Deadline');
+    isCompleted = json.getValue('IsCompleted');
   }
 
   Map<String, dynamic> toJson() {

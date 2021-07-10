@@ -1,3 +1,4 @@
+import 'package:fluttersample/util/extensions.dart';
 class LoginResponse {
   bool? isSuccess;
   String? errorMessage;
@@ -6,9 +7,9 @@ class LoginResponse {
   LoginResponse({this.isSuccess, this.errorMessage, this.token});
 
   LoginResponse.fromJson(Map<String, dynamic> json) {
-    isSuccess = json['IsSuccess'];
-    errorMessage = json['ErrorMessage'];
-    token = json['Token'];
+    isSuccess = json.getValue('IsSuccess');
+    errorMessage = json.getValue('ErrorMessage');
+    token = json.getValue('Token');
   }
 
   Map<String, dynamic> toJson() {

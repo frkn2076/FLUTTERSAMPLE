@@ -1,3 +1,4 @@
+import 'package:fluttersample/util/extensions.dart';
 class BaseResponse {
   bool? isSuccess;
   String? errorMessage;
@@ -5,8 +6,8 @@ class BaseResponse {
   BaseResponse({this.isSuccess, this.errorMessage});
 
   BaseResponse.fromJson(Map<String, dynamic> json) {
-    isSuccess = json['IsSuccess'];
-    errorMessage = json['ErrorMessage'];
+    isSuccess = json.getValue('IsSuccess');
+    errorMessage = json.getValue('ErrorMessage');
   }
 
   Map<String, dynamic> toJson() {
