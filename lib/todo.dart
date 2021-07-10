@@ -282,7 +282,6 @@ class _TodoPageState extends State<TodoPage> {
 
   String dateFormatter(DateTime date) {
     var tire = "-";
-    var colon = ":";
     return date.year.toString().padLeft(2, '0') +
         tire +
         date.month.toString().padLeft(2, '0') +
