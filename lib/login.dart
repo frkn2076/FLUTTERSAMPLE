@@ -3,8 +3,6 @@ import 'package:fluttersample/todo.dart';
 import 'package:fluttersample/util/caller.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-import 'models/loginresponse.dart';
-
 class Login extends StatelessWidget {
   final bool isTurkish;
   Login({this.isTurkish = true}) : super();
@@ -126,31 +124,37 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           TextButton(
             onPressed: () {
-              setState(() {
                 if(isLogin) {
                   login(isTurkish ? 'TR' : 'EN', userNameController.text, passwordController.text).then((response) 
                   {
                     if(response.isSuccess == true) {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => Todo(isTurkish: isTurkish,)));
+                    } else if(response.isSuccess == false) {
+                       _popup(context, message: response.errorMessage);
                     } else {
-                      _popup(context, message: isTurkish ? "Giriş bilgilerinizi kontrol ediniz" : "Check your credentials");
+                      _popup(context);
                     }
+                  }
+                  ).onError((error, stackTrace) {
+                    _popup(context);
                   }
                   );
               } else {
-                register(isTurkish ? 'TR' : 'EN', userNameController.text, passwordController.text).then((response) 
+                  register(isTurkish ? 'TR' : 'EN', userNameController.text, passwordController.text).then((response) 
                   {
                     if(response.isSuccess == true) {
                       _popup(context, message: isTurkish ? "Kayıt işlemi başarılı" : "Registered succesfully");
+                    } else if(response.isSuccess == false) {
+                       _popup(context, message: response.errorMessage);
+                    } else {
+                      _popup(context);
                     }
-                    else {
-                      _popup(context, message: response.errorMessage);
-                    }
+                  }
+                  ).onError((error, stackTrace) {
+                    _popup(context);
                   }
                 );
               }
-              });
-              
             },
             child: Text(
               text,
